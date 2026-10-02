@@ -3,7 +3,6 @@ package com.example;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -26,12 +25,6 @@ public class ExampleMod implements ClientModInitializer {
                 "category.autofish"
         ));
 
-        ClientReceiveMessageEvents.OVERLAY.register((message, indicator) -> {
-            if (!isMacroActive) return;
-            String text = message.getString();
-            if (text.contains("❤")) checkFailsafe(text);
-        });
-
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (toggleKey.wasPressed()) {
                 isMacroActive = !isMacroActive;
@@ -40,6 +33,17 @@ public class ExampleMod implements ClientModInitializer {
                 }
             }
             if (!isMacroActive || client.player == null) return;
+
+            // УМНАЯ ЗАЩИТА: Считываем HP напрямую из памяти
+            float hp = client.player.getHealth();
+            float maxHp = client.player.getMaxHealth();
+            if (maxHp > 0 && (hp / maxHp) < 0.20f) {
+                if (client.player.networkHandler != null) {
+                    client.player.networkHandler.sendCommand("hub"); 
+                }
+                isMacroActive = false;
+                return;
+            }
 
             Entity threat = getNearestSeaCreature(client, 4.0f);
             if (threat != null && threat.isAlive()) {
@@ -53,15 +57,6 @@ public class ExampleMod implements ClientModInitializer {
             if (isFighting) handleFighting(client);
             else handleFishing(client);
         });
-    }
-
-    private void checkFailsafe(String text) {
-        int currentHp = 1000, maxHp = 1000;     
-        if (maxHp > 0 && ((float) currentHp / maxHp) < 0.20f) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player != null) client.player.networkHandler.sendChatCommand("hub"); 
-            isMacroActive = false;
-        }
     }
 
     private void handleFishing(MinecraftClient client) {
