@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 public class ExampleMod implements ClientModInitializer {
-
     private boolean isMacroActive = false;
     private boolean isFighting = false;
     private Entity currentTarget = null;
@@ -40,7 +39,6 @@ public class ExampleMod implements ClientModInitializer {
                     client.player.sendMessage(Text.literal("Макрос: " + (isMacroActive ? "ВКЛ" : "ВЫКЛ")), false);
                 }
             }
-            
             if (!isMacroActive || client.player == null) return;
 
             Entity threat = getNearestSeaCreature(client, 4.0f);

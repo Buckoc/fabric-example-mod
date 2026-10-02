@@ -1,35 +1,23 @@
 {
-	"schemaVersion": 1,
-	"id": "autofish",
-	"version": "${version}",
-	"name": "AutoFish Macro",
-	"description": "Макрос на автоматическую рыбалку.",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"com.example.ExampleMod"
-		]
-	},
-	"mixins": [
-		"modid.mixins.json",
-		{
-			"config": "modid.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.19.5",
-		"minecraft": "*",
-		"java": ">=25",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "autofish",
+  "version": "${version}",
+  "name": "AutoFish Macro",
+  "description": "AutoFish for Hypixel",
+  "authors": ["Me!"],
+  "contact": {},
+  "license": "CC0-1.0",
+  "icon": "assets/autofish/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.example.ExampleMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "*",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
 }
