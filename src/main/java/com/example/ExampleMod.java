@@ -3,43 +3,42 @@ package com.example;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 public class ExampleMod implements ClientModInitializer {
     private boolean isMacroActive = false;
     private boolean isFighting = false;
     private Entity currentTarget = null;
-    private static KeyBinding toggleKey;
+    private static KeyMapping toggleKey;
 
     @Override
     public void onInitializeClient() {
-        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.autofish.toggle", 
-                InputUtil.Type.KEYSYM, 
+                InputConstants.Type.KEYSYM, 
                 GLFW.GLFW_KEY_V, 
                 "category.autofish"
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (toggleKey.wasPressed()) {
+            while (toggleKey.consumeClick()) {
                 isMacroActive = !isMacroActive;
                 if (client.player != null) {
-                    client.player.sendMessage(Text.literal("Макрос: " + (isMacroActive ? "ВКЛ" : "ВЫКЛ")), false);
+                    client.player.displayClientMessage(Component.literal("Макрос: " + (isMacroActive ? "ВКЛ" : "ВЫКЛ")), false);
                 }
             }
             if (!isMacroActive || client.player == null) return;
 
-            // УМНАЯ ЗАЩИТА: Считываем HP напрямую из памяти
             float hp = client.player.getHealth();
             float maxHp = client.player.getMaxHealth();
             if (maxHp > 0 && (hp / maxHp) < 0.20f) {
-                if (client.player.networkHandler != null) {
-                    client.player.networkHandler.sendCommand("hub"); 
+                if (client.getConnection() != null) {
+                    client.getConnection().sendCommand("hub");
                 }
                 isMacroActive = false;
                 return;
@@ -59,19 +58,19 @@ public class ExampleMod implements ClientModInitializer {
         });
     }
 
-    private void handleFishing(MinecraftClient client) {
-        if (client.player.getInventory().selectedSlot != 0) client.player.getInventory().selectedSlot = 0;
-        if (client.player.fishHook == null) rightClickMouse(client); 
-        else if (detectBite(client.player.fishHook)) rightClickMouse(client); 
+    private void handleFishing(Minecraft client) {
+        if (client.player.getInventory().selected != 0) client.player.getInventory().selected = 0;
+        if (client.player.fishing == null) rightClickMouse(client); 
+        else if (detectBite(client.player.fishing)) rightClickMouse(client); 
     }
 
-    private void handleFighting(MinecraftClient client) {
-        if (client.player.getInventory().selectedSlot != 1) client.player.getInventory().selectedSlot = 1;
+    private void handleFighting(Minecraft client) {
+        if (client.player.getInventory().selected != 1) client.player.getInventory().selected = 1;
         smoothLookAt(currentTarget);
     }
 
-    private Entity getNearestSeaCreature(MinecraftClient client, float radius) { return null; }
+    private Entity getNearestSeaCreature(Minecraft client, float radius) { return null; }
     private boolean detectBite(Entity bobber) { return false; }
     private void smoothLookAt(Entity target) {}
-    private void rightClickMouse(MinecraftClient client) {}
+    private void rightClickMouse(Minecraft client) {}
 }
