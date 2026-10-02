@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
+	"id": "autofish",
 	"version": "${version}",
-	"name": "Example Mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "AutoFish Macro",
+	"description": "Макрос на автоматическую рыбалку.",
 	"authors": [
 		"Me!"
 	],
@@ -13,13 +13,10 @@
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/modid/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"com.example.ExampleMod"
-		],
 		"client": [
-			"com.example.client.ExampleModClient"
+			"com.example.ExampleMod"
 		]
 	},
 	"mixins": [
